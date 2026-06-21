@@ -417,7 +417,7 @@ footer{border-top:1px solid var(--border);padding:1.2rem 2rem}
 
   <!-- tabs public/admin -->
   <div class="tabs" id="vehTabs">
-    <div class="tab active" onclick="switchVehTab('public',this)">👥 Véhicules</div>
+    <div class="tab active" id="vehPublicTab" onclick="switchVehTab('public',this)">👥 Véhicules</div>
     <div class="tab" id="vehAdminTab" style="display:none;" onclick="switchVehTab('admin',this)">🔐 Admin <span id="vehReportBadge" style="display:none;background:var(--red);color:#fff;font-size:.55rem;padding:1px 5px;border-radius:10px;margin-left:4px;font-family:'JetBrains Mono',monospace;"></span></div>
   </div>
 
@@ -458,7 +458,7 @@ footer{border-top:1px solid var(--border);padding:1.2rem 2rem}
   <div class="page-divider"></div>
 
   <div class="tabs" id="mloTabs">
-    <div class="tab active" onclick="switchMloTab('public',this)">🗺 Intérieurs</div>
+    <div class="tab active" id="mloPublicTab" onclick="switchMloTab('public',this)">🗺 Intérieurs</div>
     <div class="tab" id="mloAdminTab" style="display:none;" onclick="switchMloTab('admin',this)">🔐 Admin <span id="mloReportBadge" style="display:none;background:var(--red);color:#fff;font-size:.55rem;padding:1px 5px;border-radius:10px;margin-left:4px;font-family:'JetBrains Mono',monospace;"></span></div>
   </div>
 
@@ -661,17 +661,25 @@ function checkAdmin(){
 function unlockAdmin(){
   document.getElementById('btnAddVeh').style.display='';
   document.getElementById('btnAddMlo').style.display='';
+  // cacher l'onglet public, montrer admin directement
+  document.getElementById('vehPublicTab').style.display='none';
+  document.getElementById('mloPublicTab').style.display='none';
   document.getElementById('vehAdminTab').style.display='';
   document.getElementById('mloAdminTab').style.display='';
+  switchVehTab('admin',document.getElementById('vehAdminTab'));
+  switchMloTab('admin',document.getElementById('mloAdminTab'));
   renderVehiclesAdmin();renderMloAdmin();updateReportBadges();
 }
 function lockAdmin(){
   document.getElementById('btnAddVeh').style.display='none';
   document.getElementById('btnAddMlo').style.display='none';
+  // remettre l'onglet public, cacher admin
+  document.getElementById('vehPublicTab').style.display='';
+  document.getElementById('mloPublicTab').style.display='';
   document.getElementById('vehAdminTab').style.display='none';
   document.getElementById('mloAdminTab').style.display='none';
-  switchVehTab('public',document.querySelector('#vehTabs .tab'));
-  switchMloTab('public',document.querySelector('#mloTabs .tab'));
+  switchVehTab('public',document.getElementById('vehPublicTab'));
+  switchMloTab('public',document.getElementById('mloPublicTab'));
 }
 
 /* ══ TABS ══ */
@@ -740,7 +748,7 @@ function renderVehiclesPublic(){
         ${v.notes&&!v.withdrawn?`<br><span style="color:var(--text-lo)">Note :</span> ${escHtml(v.notes.slice(0,60))}${v.notes.length>60?'…':''}`:''}
       </div>
       ${rCount>0&&!v.withdrawn?`<div class="report-count">⚠ ${rCount} signalement${rCount>1?'s':''} en attente</div>`:''}
-      ${!v.withdrawn?`<div class="db-card-actions"><button class="btn btn-danger btn-sm" onclick="openReportVeh('${v.id}')">⚠ Signaler un problème</button></div>`:''}
+      ${!v.withdrawn&&!isAdmin?`<div class="db-card-actions"><button class="btn btn-danger btn-sm" onclick="openReportVeh('${v.id}')">⚠ Signaler un problème</button></div>`:''}
     </div>`
   }).join('');
 }
@@ -899,7 +907,7 @@ function renderMloPublic(){
         }
       </div>
       ${rCount>0&&!m.withdrawn?`<div class="report-count">⚠ ${rCount} signalement${rCount>1?'s':''} en attente</div>`:''}
-      ${!m.withdrawn?`<div class="db-card-actions"><button class="btn btn-danger btn-sm" onclick="openReportMlo('${m.id}')">⚠ Signaler un problème</button></div>`:''}
+      ${!m.withdrawn&&!isAdmin?`<div class="db-card-actions"><button class="btn btn-danger btn-sm" onclick="openReportMlo('${m.id}')">⚠ Signaler un problème</button></div>`:''}
     </div>`
   }).join('');
 }
