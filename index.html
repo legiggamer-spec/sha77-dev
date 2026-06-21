@@ -855,8 +855,14 @@ function submitVehReport(){
   if(!pseudo||!msg){document.getElementById('reportVehError').textContent='✗ Pseudo et message obligatoires';return}
   if(!vehReports[id])vehReports[id]=[];
   vehReports[id].push({pseudo,msg,ts:Date.now()});
-  saveVehicles();closeReportVehModal();updateReportBadges();
-  alert('✅ Signalement envoyé, merci !');
+  saveVehicles();updateReportBadges();
+  // afficher confirmation inline puis fermer
+  document.getElementById('reportVehError').style.color='var(--green)';
+  document.getElementById('reportVehError').textContent='✅ Signalement envoyé, merci !';
+  setTimeout(()=>{
+    closeReportVehModal();
+    document.getElementById('reportVehError').style.color='var(--red)';
+  },1200);
 }
 function closeReportVehModal(){document.getElementById('reportVehModal').classList.add('hidden')}
 function openVehReports(id){
@@ -1008,8 +1014,14 @@ function submitMloReport(){
   if(!pseudo||!msg){document.getElementById('reportMloError').textContent='✗ Pseudo et message obligatoires';return}
   if(!mloReports[id])mloReports[id]=[];
   mloReports[id].push({pseudo,msg,ts:Date.now()});
-  saveMlos();closeReportMloModal();updateReportBadges();
-  alert('✅ Signalement envoyé, merci !');
+  saveMlos();updateReportBadges();
+  // afficher confirmation inline puis fermer
+  document.getElementById('reportMloError').style.color='var(--green)';
+  document.getElementById('reportMloError').textContent='✅ Signalement envoyé, merci !';
+  setTimeout(()=>{
+    closeReportMloModal();
+    document.getElementById('reportMloError').style.color='var(--red)';
+  },1200);
 }
 function closeReportMloModal(){document.getElementById('reportMloModal').classList.add('hidden')}
 function openMloReports(id){
