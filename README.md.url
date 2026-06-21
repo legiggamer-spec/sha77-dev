@@ -1,0 +1,2 @@
+[InternetShortcut]
+URL=https://github.com/legiggamer-spec/sha77-dev/blob/main/README.md
