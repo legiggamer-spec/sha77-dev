@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>sha77e_Dev — FiveM Toolbox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-base:#08090c;--bg-panel:#0d0f14;--bg-card:#111318;--bg-card2:#161920;
+  --green:#00e676;--green-dim:#00b85c;--green-glow:rgba(0,230,118,.15);--green-muted:#0a2e1a;
+  --red:#e05555;--red-muted:#2a0a0a;--red-border:#5a1a1a;
+  --yellow:#ffc107;--yellow-muted:#2a2000;--yellow-border:#4a3800;
+  --blue:#7a7af0;--blue-muted:#1a1a2a;--blue-border:#2a2a5a;
+  --text-hi:#edf0f7;--text-mid:#7a8799;--text-lo:#3a4455;
+  --border:#191e2a;--border-md:#222b3a;--border-acc:#1e3828;--radius:8px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg-base);color:var(--text-hi);font-family:'Inter',sans-serif;font-size:15px;line-height:1.65;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg-base)}::-webkit-scrollbar-thumb{background:#1e3828;border-radius:3px}
+#progressBar{position:fixed;top:0;left:0;z-index:9999;height:2px;width:0%;background:linear-gradient(90deg,var(--green-dim),var(--green));box-shadow:0 0 10px var(--green);transition:width .3s ease,opacity .4s;pointer-events:none}
+
+/* HEADER */
+header{position:relative;background:var(--bg-panel);border-bottom:1px solid var(--border);padding:0 2rem;overflow:hidden}
+header::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,230,118,.018) 3px,rgba(0,230,118,.018) 4px);pointer-events:none}
+.header-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:66px;position:relative;z-index:1}
+.logo{font-family:'Rajdhani',sans-serif;font-size:1.65rem;font-weight:700;letter-spacing:.03em;color:var(--text-hi);text-decoration:none}
+.logo span{color:var(--green)}
+.logo-sub{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--green-dim);letter-spacing:.14em;margin-top:-3px;text-transform:uppercase;opacity:.8}
+.header-right{display:flex;align-items:center;gap:16px}
+.header-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.header-status{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text-mid);letter-spacing:.06em}
+.share-btn{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text-mid);background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:4px 10px;cursor:pointer;transition:all .2s;letter-spacing:.04em}
+.share-btn:hover{color:var(--green);border-color:var(--green-dim)}
+
+/* NAV */
+nav{background:var(--bg-panel);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.nav-inner{max-width:1400px;margin:0 auto;display:flex;padding:0 2rem;align-items:center;overflow-x:auto}
+.nav-item{position:relative;display:flex;align-items:center;gap:7px;padding:0 14px;height:48px;font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.07em;color:var(--text-mid);cursor:pointer;text-transform:uppercase;text-decoration:none;transition:color .18s;user-select:none;white-space:nowrap;flex-shrink:0}
+.nav-item:hover{color:var(--text-hi)}
+.nav-item.active{color:var(--green)}
+.nav-item.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--green),transparent);box-shadow:0 0 10px var(--green)}
+.nav-item.admin-on{color:var(--yellow)}
+.nav-item.admin-on.active::after{background:linear-gradient(90deg,transparent,var(--yellow),transparent);box-shadow:0 0 10px var(--yellow)}
+.nav-badge{font-size:.52rem;font-family:'JetBrains Mono',monospace;background:#141008;color:#5a5020;border:1px solid #2a2510;padding:1px 5px;border-radius:2px;letter-spacing:.05em}
+.nav-badge.g{background:var(--green-muted);color:var(--green-dim);border-color:var(--border-acc)}
+.nav-badge.r{background:var(--red-muted);color:var(--red);border-color:var(--red-border)}
+#adminReportDot{display:none;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 6px var(--red);margin-left:2px}
+
+/* SECTIONS */
+.section{display:none;opacity:0}
+.section.active{display:block;animation:fadeIn .28s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{to{opacity:1;transform:translateY(0)}}
+@keyframes spin360{to{transform:rotate(360deg)}}
+
+/* MAIN */
+main{max-width:1400px;margin:0 auto;padding:2.5rem 2rem 5rem}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;background:var(--bg-card);border:1px solid var(--border-md);border-radius:var(--radius);padding:3.5rem 3rem;margin-bottom:2rem}
+.hero-glow{position:absolute;top:-60px;right:-60px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(0,230,118,.07) 0%,transparent 65%);pointer-events:none}
+.hero-glow2{position:absolute;bottom:-80px;left:30%;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(0,184,92,.04) 0%,transparent 65%);pointer-events:none}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.12em;color:var(--green);text-transform:uppercase;margin-bottom:1.1rem;opacity:.85}
+.hero-title{font-family:'Rajdhani',sans-serif;font-size:3.2rem;font-weight:700;line-height:1.08;letter-spacing:.01em;margin-bottom:1.1rem}
+.hero-title span{color:var(--green)}
+.hero-body{color:var(--text-mid);font-size:.9rem;max-width:480px;line-height:1.75;margin-bottom:2rem}
+.hero-stats{display:flex;gap:2rem;flex-wrap:wrap}
+.hero-stat-val{font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:var(--green);line-height:1}
+.hero-stat-lbl{font-size:.72rem;color:var(--text-lo);font-family:'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;margin-top:3px}
+
+/* TOOLS GRID */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+.tool-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem 1.25rem;cursor:pointer;transition:border-color .2s,transform .18s,box-shadow .2s;position:relative;overflow:hidden}
+.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--green-dim),transparent);opacity:0;transition:opacity .2s}
+.tool-card:hover{border-color:var(--border-md);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.tool-card:hover::before{opacity:1}
+.tool-card.disabled{opacity:.38;cursor:default;pointer-events:none}
+.tool-card-icon{font-size:1.7rem;margin-bottom:.8rem}
+.tool-card-name{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-hi);margin-bottom:5px}
+.tool-card-desc{font-size:.78rem;color:var(--text-mid);line-height:1.55;margin-bottom:12px}
+.tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.58rem;padding:2px 8px;border-radius:2px;letter-spacing:.06em;text-transform:uppercase}
+.tag-live{background:var(--green-muted);color:var(--green);border:1px solid var(--border-acc)}
+.tag-soon{background:#141008;color:#5a5020;border:1px solid #2a2510}
+
+/* ROADMAP */
+.section-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text-lo);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+.roadmap{display:flex;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.roadmap-item{flex:1;min-width:150px;padding:1.1rem 1.25rem;border-right:1px solid var(--border)}
+.roadmap-item:last-child{border-right:none}
+.roadmap-phase{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text-lo);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.roadmap-name{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;color:var(--text-hi);letter-spacing:.04em;margin-bottom:3px}
+.roadmap-desc{font-size:.75rem;color:var(--text-mid)}
+.rdot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.rdot-done{background:var(--green);box-shadow:0 0 6px var(--green)}
+.rdot-wip{background:var(--yellow);box-shadow:0 0 6px rgba(255,193,7,.6)}
+.rdot-plan{background:var(--text-lo)}
+
+/* PAGE HEADER */
+.page-title{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;letter-spacing:.03em;margin-bottom:4px}
+.page-title span{color:var(--green)}
+.page-desc{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--text-mid);letter-spacing:.04em}
+.page-divider{height:1px;margin:1.5rem 0 2rem;background:linear-gradient(90deg,var(--green-dim),transparent);opacity:.3}
+
+/* CARDS */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem}
+.card+.card{margin-top:1rem}
+.card-title{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.07em;color:var(--green);text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--border-md);border-radius:6px;padding:2.5rem 1rem;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;background:var(--bg-base)}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--green-dim);background:rgba(0,230,118,.025)}
+.upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:2rem;margin-bottom:.6rem;opacity:.6}
+.upload-text{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:600;color:var(--text-mid);letter-spacing:.04em}
+.upload-hint{font-size:.7rem;color:var(--text-lo);margin-top:4px;font-family:'JetBrains Mono',monospace}
+
+/* SETTINGS */
+.setting{margin-bottom:1.2rem}.setting:last-child{margin-bottom:0}
+.setting-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text-mid);letter-spacing:.09em;text-transform:uppercase;display:block;margin-bottom:.5rem}
+.color-row{display:flex;align-items:center;gap:8px}
+.color-row input[type="color"]{width:34px;height:34px;border:1px solid var(--border-md);border-radius:5px;background:none;cursor:pointer;padding:2px}
+.hex-input{flex:1;background:var(--bg-base);border:1px solid var(--border-md);border-radius:5px;padding:7px 10px;color:var(--text-hi);font-family:'JetBrains Mono',monospace;font-size:.78rem;outline:none;transition:border-color .2s}
+.hex-input:focus{border-color:var(--green-dim)}
+.preset-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.preset-btn{width:24px;height:24px;border-radius:4px;border:2px solid transparent;cursor:pointer;transition:border-color .15s,transform .1s}
+.preset-btn:hover{border-color:var(--text-mid);transform:scale(1.12)}
+.preset-btn.selected{border-color:var(--green)}
+.slider-wrap{display:flex;align-items:center;gap:10px}
+input[type="range"]{flex:1;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--border-md);outline:none;cursor:pointer}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green-glow);cursor:pointer}
+.slider-val{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--green);min-width:38px;text-align:right}
+.fmt-row{display:flex;gap:12px}
+.fmt-row label{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--text-mid);cursor:pointer}
+.fmt-row input[type="radio"]{accent-color:var(--green)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border-radius:5px;border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:.88rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:all .18s;width:100%}
+.btn-primary{background:var(--green);color:#000}
+.btn-primary:hover:not(:disabled){background:#1fffa0;box-shadow:0 0 16px var(--green-glow)}
+.btn-primary:disabled{background:var(--border-md);color:var(--text-lo);cursor:not-allowed}
+.btn-secondary{background:transparent;color:var(--green);border:1px solid var(--green-dim)}
+.btn-secondary:hover:not(:disabled){background:var(--green-muted)}
+.btn-secondary:disabled{opacity:.35;cursor:not-allowed}
+.btn-danger{background:transparent;color:var(--red);border:1px solid var(--red-border)}
+.btn-danger:hover:not(:disabled){background:var(--red-muted)}
+.btn-danger:disabled{opacity:.25;cursor:not-allowed}
+.btn-warning{background:transparent;color:var(--yellow);border:1px solid var(--yellow-border)}
+.btn-warning:hover:not(:disabled){background:var(--yellow-muted)}
+.btn-sm{padding:6px 12px;font-size:.78rem;width:auto}
+.btn-row{display:flex;flex-direction:column;gap:8px;margin-top:1.25rem}
+.btn-row-inline{display:flex;gap:8px}
+.btn-row-inline .btn{flex:1}
+
+/* STATUS BAR */
+.status-bar{background:var(--bg-base);border:1px solid var(--border);border-radius:5px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text-mid);letter-spacing:.03em;margin-top:1rem;min-height:36px;display:flex;align-items:center;gap:8px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--text-lo);flex-shrink:0;transition:background .3s,box-shadow .3s}
+.status-dot.green{background:var(--green);box-shadow:0 0 6px var(--green)}
+.status-dot.yellow{background:var(--yellow);box-shadow:0 0 6px rgba(255,193,7,.6)}
+
+/* PREVIEW */
+.preview-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text-lo);letter-spacing:.09em;text-transform:uppercase;margin-bottom:6px}
+.preview-wrap{position:relative;width:100%;padding-bottom:66%;border-radius:6px;overflow:hidden;background:var(--bg-base);border:1px solid var(--border)}
+.preview-wrap canvas{position:absolute;inset:0;width:100%;height:100%;display:none}
+.preview-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-lo);font-family:'JetBrains Mono',monospace;font-size:.7rem;gap:8px;letter-spacing:.05em}
+.ph-icon{font-size:2rem;opacity:.25}
+.preview-dims{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text-lo);margin-top:5px;text-align:right}
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;align-items:start}
+@media(max-width:820px){.tool-grid{grid-template-columns:1fr}}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1.5rem}
+.tab{padding:10px 20px;font-family:'Rajdhani',sans-serif;font-size:.88rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-mid);cursor:pointer;border-bottom:2px solid transparent;transition:color .18s,border-color .18s}
+.tab:hover{color:var(--text-hi)}
+.tab.active{color:var(--green);border-color:var(--green)}
+
+/* SEARCH */
+.search-row{display:flex;gap:10px;margin-bottom:1.5rem;flex-wrap:wrap}
+.search-input{flex:1;min-width:180px;background:var(--bg-card);border:1px solid var(--border-md);border-radius:6px;padding:9px 14px;color:var(--text-hi);font-size:.88rem;outline:none;transition:border-color .2s}
+.search-input:focus{border-color:var(--green-dim)}
+.search-select{background:var(--bg-card);border:1px solid var(--border-md);border-radius:6px;padding:9px 12px;color:var(--text-hi);font-size:.85rem;outline:none;cursor:pointer}
+
+/* DB CARDS */
+.db-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
+.db-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .18s,transform .15s;position:relative}
+.db-card.clickable{cursor:pointer}
+.db-card.clickable:hover{border-color:var(--green-dim);transform:translateY(-2px)}
+.db-card.withdrawn{border-color:var(--red-border);opacity:.75}
+.db-card-img{width:100%;height:130px;object-fit:cover;display:block;background:var(--bg-base)}
+.db-card-img-placeholder{width:100%;height:130px;display:flex;align-items:center;justify-content:center;background:var(--bg-base);color:var(--text-lo);font-size:2rem;opacity:.3}
+.db-card-body{padding:1rem}
+.db-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px}
+.db-card-name{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--text-hi);letter-spacing:.04em}
+.db-card-spawn{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--green-dim);margin-bottom:6px}
+.db-card-meta{font-size:.75rem;color:var(--text-mid);line-height:1.5;margin-bottom:8px}
+.db-badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.58rem;padding:2px 8px;border-radius:2px;letter-spacing:.05em;text-transform:uppercase}
+.b-ok{background:var(--green-muted);color:var(--green);border:1px solid var(--border-acc)}
+.b-wip{background:var(--yellow-muted);color:var(--yellow);border:1px solid var(--yellow-border)}
+.b-err{background:var(--red-muted);color:var(--red);border:1px solid var(--red-border)}
+.b-off{background:#1a0a0a;color:#c04040;border:1px solid #5a1a1a}
+.b-idea{background:var(--blue-muted);color:var(--blue);border:1px solid var(--blue-border)}
+.db-card-actions{display:flex;gap:6px;flex-wrap:wrap}
+.report-count{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--red);margin-bottom:6px;cursor:pointer}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:1rem}
+.modal-overlay.hidden{display:none}
+.modal-box{background:var(--bg-card);border:1px solid var(--border-md);border-radius:var(--radius);padding:1.75rem;width:100%;max-width:440px;max-height:90vh;overflow-y:auto}
+.modal-icon{font-size:2rem;text-align:center;margin-bottom:.75rem}
+.modal-title{font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:var(--green);text-align:center;letter-spacing:.05em;margin-bottom:4px}
+.modal-sub{font-size:.78rem;color:var(--text-mid);text-align:center;margin-bottom:1.2rem}
+.modal-input{width:100%;background:var(--bg-base);border:1px solid var(--border-md);border-radius:5px;padding:9px 12px;color:var(--text-hi);font-size:.86rem;outline:none;transition:border-color .2s;resize:vertical;font-family:'Inter',sans-serif}
+.modal-input:focus{border-color:var(--green-dim)}
+.modal-field{margin-bottom:10px}
+.modal-field label{display:block;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text-mid);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.modal-error{font-size:.75rem;text-align:center;min-height:18px;margin:6px 0;font-family:'JetBrains Mono',monospace;color:var(--red)}
+.mbtn{flex:1;border:none;border-radius:5px;padding:10px;font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:background .18s}
+.mbtn-primary{background:var(--green);color:#000}.mbtn-primary:hover{background:#1fffa0}
+.mbtn-secondary{background:transparent;color:var(--text-mid);border:1px solid var(--border-md)}.mbtn-secondary:hover{background:var(--bg-base)}
+.mbtn-danger{background:transparent;color:var(--red);border:1px solid var(--red-border)}.mbtn-danger:hover{background:var(--red-muted)}
+.mbtn-warn{background:transparent;color:var(--yellow);border:1px solid var(--yellow-border)}.mbtn-warn:hover{background:var(--yellow-muted)}
+.modal-btn-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+
+/* IMG UPLOAD IN MODAL */
+.img-upload-zone{border:2px dashed var(--border-md);border-radius:6px;padding:1.2rem;text-align:center;cursor:pointer;position:relative;background:var(--bg-base);transition:border-color .2s}
+.img-upload-zone:hover{border-color:var(--green-dim)}
+.img-upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.img-preview-thumb{width:100%;height:120px;object-fit:cover;border-radius:5px;display:none;margin-top:8px}
+
+/* REPORT LIST */
+.report-item{background:var(--bg-base);border:1px solid var(--border);border-radius:5px;padding:10px 12px;margin-bottom:8px;font-size:.8rem}
+.report-item-name{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--green-dim);margin-bottom:3px}
+.report-item-msg{color:var(--text-mid)}
+.report-item-date{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--text-lo);margin-top:4px}
+.no-reports{text-align:center;padding:1.5rem;color:var(--text-lo);font-family:'JetBrains Mono',monospace;font-size:.72rem}
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--text-lo);font-family:'JetBrains Mono',monospace;font-size:.8rem;letter-spacing:.04em}
+.empty-icon{font-size:2.5rem;opacity:.3;margin-bottom:1rem}
+.withdrawn-banner{background:var(--red-muted);border:1px solid var(--red-border);border-radius:5px;padding:8px 14px;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--red);letter-spacing:.04em;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.anim-card{opacity:0;transform:translateY(16px);animation:slideUp .4s ease forwards}
+.anim-card:nth-child(1){animation-delay:.05s}.anim-card:nth-child(2){animation-delay:.12s}
+.anim-card:nth-child(3){animation-delay:.19s}.anim-card:nth-child(4){animation-delay:.26s}
+.anim-card:nth-child(5){animation-delay:.33s}.anim-card:nth-child(6){animation-delay:.4s}
+
+/* ADMIN DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+.dash-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center}
+.dash-val{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:var(--green);line-height:1}
+.dash-lbl{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text-lo);text-transform:uppercase;letter-spacing:.08em;margin-top:5px}
+.dash-warn{color:var(--red)}
+
+/* CHANGELOG */
+.changelog-item{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;position:relative}
+.changelog-date{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--green-dim);letter-spacing:.06em;margin-bottom:4px}
+.changelog-title{font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:var(--text-hi);margin-bottom:6px}
+.changelog-body{font-size:.82rem;color:var(--text-mid);line-height:1.6;white-space:pre-wrap}
+.changelog-del{position:absolute;top:10px;right:10px;background:transparent;border:none;color:var(--text-lo);cursor:pointer;font-size:1rem;transition:color .2s}
+.changelog-del:hover{color:var(--red)}
+
+/* NOTEPAD */
+.notepad{width:100%;min-height:300px;background:var(--bg-card);border:1px solid var(--border-md);border-radius:var(--radius);padding:1rem;color:var(--text-hi);font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.7;resize:vertical;outline:none;transition:border-color .2s}
+.notepad:focus{border-color:var(--green-dim)}
+
+/* PLATE GEN */
+.plate-display{background:#f5e642;color:#1a1a1a;font-family:'Rajdhani',sans-serif;font-size:2.2rem;font-weight:700;letter-spacing:.2em;text-align:center;padding:12px 28px;border-radius:6px;border:3px solid #c8c012;width:fit-content;margin:0 auto 1.5rem;min-width:200px;text-transform:uppercase;position:relative}
+.plate-display::before{content:'';position:absolute;top:4px;left:4px;right:4px;bottom:4px;border:2px solid rgba(0,0,0,.15);border-radius:3px;pointer-events:none}
+
+/* TIME CALC */
+.time-display{font-family:'Rajdhani',sans-serif;font-size:3rem;font-weight:700;color:var(--green);text-align:center;letter-spacing:.05em;padding:1rem}
+.time-label{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text-lo);text-align:center;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:1.2rem 2rem}
+.footer-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.footer-logo{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.88rem;color:var(--text-lo);letter-spacing:.05em}
+.footer-logo span{color:#1e4030}
+.footer-copy{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text-lo);letter-spacing:.04em}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--bg-card);border:1px solid var(--green-dim);border-radius:6px;padding:12px 20px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--green);letter-spacing:.04em;z-index:9000;animation:toastIn .25s ease;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div id="progressBar"></div>
+
+<header>
+  <div class="header-inner">
+    <div><div class="logo">sha77e<span>_Dev</span></div><div class="logo-sub">// FiveM · GTA V · Tools</div></div>
+    <div class="header-right">
+      <button class="share-btn" onclick="shareLink()">🔗 Partager</button>
+      <span class="header-dot"></span>
+      <span class="header-status">Online</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-item active" onclick="showSection('home',this)">⬡ Accueil</a>
+    <a class="nav-item" onclick="showSection('greenscreen',this)">🟩 Fond Vert <span class="nav-badge g">PROPS</span></a>
+    <a class="nav-item" href="https://legiggamer-spec.github.io/gta5_props/" target="_blank">📦 Props Browser <span class="nav-badge g">GTA V</span></a>
+    <a class="nav-item" onclick="showSection('vehicles',this)" id="nav-vehicles">🚗 Vehicles</a>
+    <a class="nav-item" onclick="showSection('mlo',this)" id="nav-mlo">🏗 MLO</a>
+    <a class="nav-item" onclick="showSection('changelog',this)" id="nav-changelog">📋 Changelog</a>
+    <a class="nav-item" onclick="showSection('tools',this)" id="nav-tools">🛠 Outils</a>
+    <a class="nav-item" id="nav-admin-btn" onclick="toggleAdmin(this)" style="margin-left:auto;">🔐 Admin <span id="adminReportDot"></span></a>
+  </div>
+</nav>
+
+<main>
+
+<!-- HOME -->
+<section class="section active" id="section-home">
+  <div class="hero">
+    <div class="hero-glow"></div><div class="hero-glow2"></div>
+    <div class="hero-eyebrow">// sha77e_Dev — FiveM Toolbox</div>
+    <div class="hero-title">Tes outils<br><span>FiveM</span>, au même endroit.</div>
+    <p class="hero-body">Un espace centralisé pour gérer tes ressources GTA V / FiveM. Props, véhicules, MLO, outils — tout en un.</p>
+    <div class="hero-stats">
+      <div><div class="hero-stat-val" id="homeStatVeh">0</div><div class="hero-stat-lbl">Véhicules</div></div>
+      <div><div class="hero-stat-val" id="homeStatMlo">0</div><div class="hero-stat-lbl">MLO</div></div>
+      <div><div class="hero-stat-val">5293</div><div class="hero-stat-lbl">Props GTA V</div></div>
+      <div><div class="hero-stat-val">∞</div><div class="hero-stat-lbl">À venir</div></div>
+    </div>
+  </div>
+  <div class="section-label">// Outils disponibles</div>
+  <div class="tools-grid">
+    <div class="tool-card anim-card" onclick="showSection('greenscreen',document.querySelector('[onclick*=greenscreen]'))"><div class="tool-card-icon">🟩</div><div class="tool-card-name">Fond Vert</div><div class="tool-card-desc">Fond chromakey pour tes screenshots de props FiveM.</div><span class="tag tag-live">Disponible</span></div>
+    <div class="tool-card anim-card" onclick="window.open('https://legiggamer-spec.github.io/gta5_props/','_blank')"><div class="tool-card-icon">📦</div><div class="tool-card-name">Props Browser</div><div class="tool-card-desc">5 293 props GTA V avec photos en jeu.</div><span class="tag tag-live">Disponible</span></div>
+    <div class="tool-card anim-card" onclick="showSection('vehicles',document.getElementById('nav-vehicles'))"><div class="tool-card-icon">🚗</div><div class="tool-card-name">Vehicles DB</div><div class="tool-card-desc">Carpack FiveM : statuts, photos, signalements.</div><span class="tag tag-live">Disponible</span></div>
+    <div class="tool-card anim-card" onclick="showSection('mlo',document.getElementById('nav-mlo'))"><div class="tool-card-icon">🏗</div><div class="tool-card-name">MLO Helper</div><div class="tool-card-desc">Intérieurs FiveM avec carte et signalements.</div><span class="tag tag-live">Disponible</span></div>
+    <div class="tool-card anim-card" onclick="showSection('changelog',document.getElementById('nav-changelog'))"><div class="tool-card-icon">📋</div><div class="tool-card-name">Changelog</div><div class="tool-card-desc">Mises à jour et nouveautés du serveur.</div><span class="tag tag-live">Disponible</span></div>
+    <div class="tool-card anim-card" onclick="showSection('tools',document.getElementById('nav-tools'))"><div class="tool-card-icon">🛠</div><div class="tool-card-name">Outils</div><div class="tool-card-desc">Générateur de plaques, temps RP, notepad.</div><span class="tag tag-live">Disponible</span></div>
+  </div>
+  <div class="section-label">// Roadmap</div>
+  <div class="roadmap">
+    <div class="roadmap-item"><div class="roadmap-phase">Phase 1</div><div class="roadmap-name"><span class="rdot rdot-done"></span>Fond Vert</div><div class="roadmap-desc">Upload · chromakey · export</div></div>
+    <div class="roadmap-item"><div class="roadmap-phase">Phase 2</div><div class="roadmap-name"><span class="rdot rdot-done"></span>Props Browser</div><div class="roadmap-desc">5 293 props avec photos</div></div>
+    <div class="roadmap-item"><div class="roadmap-phase">Phase 3</div><div class="roadmap-name"><span class="rdot rdot-done"></span>Vehicles DB</div><div class="roadmap-desc">Carpack & signalements</div></div>
+    <div class="roadmap-item"><div class="roadmap-phase">Phase 4</div><div class="roadmap-name"><span class="rdot rdot-done"></span>MLO Helper</div><div class="roadmap-desc">Intérieurs & carte</div></div>
+    <div class="roadmap-item"><div class="roadmap-phase">Phase 5</div><div class="roadmap-name"><span class="rdot rdot-done"></span>Outils & Changelog</div><div class="roadmap-desc">Plaques · temps RP · notes</div></div>
+  </div>
+</section>
+
+<!-- GREENSCREEN -->
+<section class="section" id="section-greenscreen">
+  <div class="page-title">Fond <span>Vert</span> · Props GTA</div>
+  <div class="page-desc">// Upload · fond chromakey · téléchargement</div>
+  <div class="page-divider"></div>
+  <div class="tool-grid">
+    <div>
+      <div class="card">
+        <div class="card-title">📁 Image source</div>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="fileInput" accept="image/*" onchange="handleFile(this.files[0])"/>
+          <div class="upload-icon">⬆</div><div class="upload-text">Glisse ou clique pour uploader</div><div class="upload-hint">PNG · JPG · WEBP · max 20 Mo</div>
+        </div>
+        <div class="status-bar"><span class="status-dot" id="statusDot"></span><span id="statusText">En attente d'une image…</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚙ Paramètres</div>
+        <div class="setting"><span class="setting-label">Couleur du fond</span>
+          <div class="color-row"><input type="color" id="colorPicker" value="#00b140" oninput="syncColor(this.value)"/><input type="text" class="hex-input" id="hexInput" value="#00B140" maxlength="7" oninput="syncHex(this.value)"/></div>
+          <div class="preset-row" id="presetRow"></div>
+        </div>
+        <div class="setting"><span class="setting-label">Rembourrage</span><div class="slider-wrap"><input type="range" id="paddingSlider" min="0" max="200" value="20" oninput="updatePadding(this.value)"/><span class="slider-val" id="paddingVal">20px</span></div></div>
+        <div class="setting"><span class="setting-label">Format</span><div class="fmt-row"><label><input type="radio" name="fmt" value="png" checked/> PNG</label><label><input type="radio" name="fmt" value="jpeg"/> JPG</label><label><input type="radio" name="fmt" value="webp"/> WEBP</label></div></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="processBtn" disabled onclick="processImage()">✦ Appliquer le fond</button>
+          <div class="btn-row-inline">
+            <button class="btn btn-secondary" id="downloadBtn" disabled onclick="downloadImage()">⬇ Télécharger</button>
+            <button class="btn btn-danger" id="resetBtn" disabled onclick="resetTool()">✕ Annuler</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card"><div class="card-title">👁 Original</div><div class="preview-label">Source</div><div class="preview-wrap"><canvas id="previewCanvas"></canvas><div class="preview-placeholder" id="previewPlaceholder"><div class="ph-icon">🖼</div><span>Aucune image</span></div></div><div class="preview-dims" id="previewDims"></div></div>
+      <div class="card"><div class="card-title">✅ Résultat</div><div class="preview-label">Avec fond</div><div class="preview-wrap"><canvas id="resultCanvas"></canvas><div class="preview-placeholder" id="resultPlaceholder"><div class="ph-icon">⬡</div><span>Résultat ici</span></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- VEHICLES -->
+<section class="section" id="section-vehicles">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:4px;">
+    <div><div class="page-title">🚗 Vehicles <span>DB</span></div><div class="page-desc">// Carpack FiveM · statuts · photos · signalements</div></div>
+    <button class="btn btn-primary btn-sm" id="btnAddVeh" style="display:none;" onclick="openAddVehicle()">+ Ajouter</button>
+  </div>
+  <div class="page-divider"></div>
+  <div class="tabs" id="vehTabs">
+    <div class="tab active" id="vehPublicTab" onclick="switchVehTab('public',this)">👥 Véhicules</div>
+    <div class="tab" id="vehAdminTab" style="display:none;" onclick="switchVehTab('admin',this)">🔐 Admin <span id="vehReportBadge" style="display:none;background:var(--red);color:#fff;font-size:.55rem;padding:1px 6px;border-radius:10px;margin-left:4px;font-family:'JetBrains Mono',monospace;"></span></div>
+  </div>
+  <div id="vehPublicView">
+    <div id="withdrawnBanner" class="withdrawn-banner" style="display:none;">⚠ Certains véhicules sont temporairement retirés du serveur.</div>
+    <div class="search-row">
+      <input type="text" class="search-input" id="vehSearch" placeholder="Rechercher..." oninput="renderVehiclesPublic()"/>
+      <select class="search-select" id="vehCatFilter" onchange="renderVehiclesPublic()"><option value="">Toutes catégories</option><option>Pompiers</option><option>Police</option><option>EMS</option><option>Civil</option><option>Autre</option></select>
+      <select class="search-select" id="vehStatusFilter" onchange="renderVehiclesPublic()"><option value="">Tous statuts</option><option>✅ Validé</option><option>🔧 En cours</option></select>
+    </div>
+    <div class="db-grid" id="vehPublicGrid"></div>
+    <div class="empty-state" id="vehPublicEmpty" style="display:none;"><div class="empty-icon">🚗</div>Aucun véhicule trouvé</div>
+  </div>
+  <div id="vehAdminView" style="display:none;">
+    <div class="search-row">
+      <input type="text" class="search-input" id="vehAdminSearch" placeholder="Rechercher..." oninput="renderVehiclesAdmin()"/>
+      <select class="search-select" id="vehAdminStatus" onchange="renderVehiclesAdmin()"><option value="">Tous statuts</option><option>✅ Validé</option><option>🔧 En cours</option><option>❌ Problème</option><option>🚫 Retiré</option></select>
+    </div>
+    <div class="db-grid" id="vehAdminGrid"></div>
+    <div class="empty-state" id="vehAdminEmpty" style="display:none;"><div class="empty-icon">🚗</div>Aucun véhicule</div>
+  </div>
+</section>
+
+<!-- MLO -->
+<section class="section" id="section-mlo">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:4px;">
+    <div><div class="page-title">🏗 MLO <span>Helper</span></div><div class="page-desc">// Intérieurs FiveM · suivi · carte · signalements</div></div>
+    <button class="btn btn-primary btn-sm" id="btnAddMlo" style="display:none;" onclick="openAddMlo()">+ Ajouter</button>
+  </div>
+  <div class="page-divider"></div>
+  <div class="tabs" id="mloTabs">
+    <div class="tab active" id="mloPublicTab" onclick="switchMloTab('public',this)">🗺 Intérieurs</div>
+    <div class="tab" id="mloAdminTab" style="display:none;" onclick="switchMloTab('admin',this)">🔐 Admin <span id="mloReportBadge" style="display:none;background:var(--red);color:#fff;font-size:.55rem;padding:1px 6px;border-radius:10px;margin-left:4px;font-family:'JetBrains Mono',monospace;"></span></div>
+  </div>
+  <div id="mloPublicView">
+    <div class="search-row">
+      <input type="text" class="search-input" id="mloSearch" placeholder="Rechercher un MLO..." oninput="renderMloPublic()"/>
+      <select class="search-select" id="mloStatusFilter" onchange="renderMloPublic()"><option value="">Tous statuts</option><option>✅ Terminé</option><option>🔧 En cours</option><option>💡 Idée</option><option>🚫 Retiré</option></select>
+    </div>
+    <div class="db-grid" id="mloPublicGrid"></div>
+    <div class="empty-state" id="mloPublicEmpty" style="display:none;"><div class="empty-icon">🏗</div>Aucun MLO trouvé</div>
+  </div>
+  <div id="mloAdminView" style="display:none;">
+    <div class="search-row"><input type="text" class="search-input" id="mloAdminSearch" placeholder="Rechercher..." oninput="renderMloAdmin()"/></div>
+    <div class="db-grid" id="mloAdminGrid"></div>
+    <div class="empty-state" id="mloAdminEmpty" style="display:none;"><div class="empty-icon">🏗</div>Aucun MLO</div>
+  </div>
+</section>
+
+<!-- CHANGELOG -->
+<section class="section" id="section-changelog">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:4px;">
+    <div><div class="page-title">📋 <span>Changelog</span></div><div class="page-desc">// Mises à jour et nouveautés du serveur</div></div>
+    <button class="btn btn-primary btn-sm" id="btnAddChangelog" style="display:none;" onclick="openAddChangelog()">+ Nouvelle entrée</button>
+  </div>
+  <div class="page-divider"></div>
+  <div id="changelogList"></div>
+  <div class="empty-state" id="changelogEmpty" style="display:none;"><div class="empty-icon">📋</div>Aucune entrée de changelog</div>
+</section>
+
+<!-- TOOLS -->
+<section class="section" id="section-tools">
+  <div class="page-title">🛠 <span>Outils</span></div>
+  <div class="page-desc">// Générateur de plaques · Temps RP · Notepad admin</div>
+  <div class="page-divider"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem;align-items:start;">
+
+    <!-- PLATE GEN -->
+    <div class="card">
+      <div class="card-title">🚘 Générateur de plaque GTA</div>
+      <div class="plate-display" id="plateDisplay">AB12 CD3</div>
+      <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;">
+        <select class="search-select" id="plateStyle" style="flex:1;" onchange="updatePlate()">
+          <option value="gta">Standard GTA</option>
+          <option value="vanity">Vanity (custom)</option>
+        </select>
+      </div>
+      <div id="vanityInput" style="display:none;margin-bottom:1rem;">
+        <input type="text" class="search-input" id="plateCustom" maxlength="8" placeholder="Ton texte (max 8)" oninput="updatePlate()" style="text-transform:uppercase;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;"/>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" onclick="generatePlate()" style="flex:1;">🎲 Générer</button>
+        <button class="btn btn-secondary" onclick="copyPlate()" style="flex:1;">📋 Copier</button>
+      </div>
+    </div>
+
+    <!-- TIME CALC -->
+    <div class="card">
+      <div class="card-title">⏱ Calculateur temps RP</div>
+      <div class="setting"><span class="setting-label">Multiplicateur serveur</span>
+        <div class="slider-wrap">
+          <input type="range" id="timeMult" min="2" max="10" value="4" step="1" oninput="updateTimeCalc()"/>
+          <span class="slider-val" id="timeMultVal">x4</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem;">
+        <div>
+          <div class="time-label">Temps réel</div>
+          <input type="number" class="search-input" id="timeReal" value="60" min="1" oninput="updateTimeCalc()" style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:1.1rem;"/>
+          <div class="time-label" style="margin-top:4px;">minutes</div>
+        </div>
+        <div>
+          <div class="time-label">Temps RP</div>
+          <div class="time-display" id="timeRp">4h00</div>
+        </div>
+      </div>
+      <div style="margin-top:1rem;background:var(--bg-base);border:1px solid var(--border);border-radius:5px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text-mid);">
+        <div>1 min réel = <span id="timeConv1" style="color:var(--green);">4 min</span> RP</div>
+        <div>1 heure réelle = <span id="timeConv2" style="color:var(--green);">4h</span> RP</div>
+        <div>1 jour RP = <span id="timeConv3" style="color:var(--green);">6h</span> réel</div>
+      </div>
+    </div>
+
+    <!-- NOTEPAD -->
+    <div class="card" id="notepadCard" style="display:none;">
+      <div class="card-title">📝 Notepad Admin</div>
+      <textarea class="notepad" id="notepadText" placeholder="Notes rapides admin..." oninput="saveNotepad()"></textarea>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text-lo);" id="notepadStatus">Auto-sauvegardé</span>
+        <button class="btn btn-danger btn-sm" onclick="clearNotepad()">🗑 Effacer</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ADMIN DASHBOARD -->
+<section class="section" id="section-admin">
+  <div class="page-title">🔐 <span>Admin</span></div>
+  <div class="page-desc">// Tableau de bord · export · import</div>
+  <div class="page-divider"></div>
+  <div class="dash-grid">
+    <div class="dash-card"><div class="dash-val" id="dashVeh">0</div><div class="dash-lbl">Véhicules</div></div>
+    <div class="dash-card"><div class="dash-val" id="dashMlo">0</div><div class="dash-lbl">MLO</div></div>
+    <div class="dash-card"><div class="dash-val" id="dashChangelog">0</div><div class="dash-lbl">Changelogs</div></div>
+    <div class="dash-card"><div class="dash-val dash-warn" id="dashReports">0</div><div class="dash-lbl">Signalements</div></div>
+    <div class="dash-card"><div class="dash-val dash-warn" id="dashWithdrawn">0</div><div class="dash-lbl">Retirés</div></div>
+  </div>
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+    <div class="card" style="flex:1;min-width:260px;">
+      <div class="card-title">💾 Export / Import données</div>
+      <p style="font-size:.8rem;color:var(--text-mid);margin-bottom:1rem;">Sauvegarde toutes tes données (véhicules, MLO, changelog, notes) dans un fichier JSON.</p>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="exportData()">⬇ Exporter JSON</button>
+        <div style="position:relative;">
+          <button class="btn btn-warning" style="width:100%;" onclick="document.getElementById('importFile').click()">⬆ Importer JSON</button>
+          <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(this)"/>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="flex:1;min-width:260px;">
+      <div class="card-title">⚠ Signalements en attente</div>
+      <div id="dashReportsList"></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">sha77e<span>_Dev</span></div>
+    <div class="footer-copy">// FiveM RP Server Tools · Brussels</div>
+  </div>
+</footer>
+
+<!-- MODALS -->
+<div class="modal-overlay hidden" id="adminModal">
+  <div class="modal-box"><div class="modal-icon">🔐</div><div class="modal-title">Mode Admin</div><div class="modal-sub">Mot de passe administrateur</div>
+    <input type="password" id="adminPwInput" class="modal-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkAdmin()"/>
+    <div class="modal-error" id="adminError"></div>
+    <div class="modal-btn-row"><button class="mbtn mbtn-primary" onclick="checkAdmin()">Connexion</button><button class="mbtn mbtn-secondary" onclick="closeAdminModal()">Annuler</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="vehModal">
+  <div class="modal-box" style="max-width:500px;">
+    <div class="modal-title" id="vehModalTitle">Ajouter un véhicule</div>
+    <div style="margin:1rem 0;">
+      <div class="modal-field"><label>Photo du véhicule</label>
+        <div class="img-upload-zone"><input type="file" id="vehImgInput" accept="image/*" onchange="previewVehImg(this)"/><div style="color:var(--text-lo);font-size:.8rem;">📷 Clique pour uploader une photo</div></div>
+        <img id="vehImgPreview" class="img-preview-thumb" alt=""/>
+      </div>
+      <div class="modal-field"><label>Nom affiché</label><input type="text" id="vehName" class="modal-input" placeholder="ex: Firetruck S4NA"/></div>
+      <div class="modal-field"><label>Spawn name</label><input type="text" id="vehSpawn" class="modal-input" placeholder="ex: firetruk"/></div>
+      <div class="modal-field"><label>Catégorie</label><select id="vehCat" class="modal-input"><option>Pompiers</option><option>Police</option><option>EMS</option><option>Civil</option><option>Autre</option></select></div>
+      <div class="modal-field"><label>Statut</label><select id="vehStatus" class="modal-input"><option>✅ Validé</option><option>🔧 En cours</option><option>❌ Problème</option></select></div>
+      <div class="modal-field"><label>Notes</label><textarea id="vehNotes" class="modal-input" rows="2" placeholder="ELS ok, sons à revoir..."></textarea></div>
+    </div>
+    <div class="modal-error" id="vehError"></div>
+    <div class="modal-btn-row">
+      <button class="mbtn mbtn-primary" onclick="saveVehicle()">Enregistrer</button>
+      <button class="mbtn mbtn-warn" id="vehWithdrawBtn" style="display:none;" onclick="toggleWithdrawVeh()"></button>
+      <button class="mbtn mbtn-danger" id="vehDeleteBtn" style="display:none;" onclick="deleteVehicle()">Supprimer</button>
+      <button class="mbtn mbtn-secondary" onclick="closeVehModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="vehReportsModal">
+  <div class="modal-box" style="max-width:500px;">
+    <div class="modal-title" id="vehReportsTitle">Signalements</div>
+    <div id="vehReportsList" style="margin:1rem 0;max-height:300px;overflow-y:auto;"></div>
+    <div class="modal-btn-row"><button class="mbtn mbtn-danger" onclick="clearVehReports()">Effacer tout</button><button class="mbtn mbtn-secondary" onclick="closeVehReportsModal()">Fermer</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="reportVehModal">
+  <div class="modal-box"><div class="modal-icon">⚠</div><div class="modal-title" id="reportVehTitle">Signaler un problème</div><div class="modal-sub" id="reportVehSub"></div>
+    <div style="margin:1rem 0;">
+      <div class="modal-field"><label>Ton pseudo</label><input type="text" id="reportVehPseudo" class="modal-input" placeholder="ex: PlayerOne"/></div>
+      <div class="modal-field"><label>Description</label><textarea id="reportVehMsg" class="modal-input" rows="3" placeholder="Le véhicule ne spawn pas..."></textarea></div>
+    </div>
+    <div class="modal-error" id="reportVehError"></div>
+    <div class="modal-btn-row"><button class="mbtn mbtn-primary" onclick="submitVehReport()">Envoyer</button><button class="mbtn mbtn-secondary" onclick="closeReportVehModal()">Annuler</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="mloModal">
+  <div class="modal-box" style="max-width:500px;">
+    <div class="modal-title" id="mloModalTitle">Ajouter un MLO</div>
+    <div style="margin:1rem 0;">
+      <div class="modal-field"><label>Nom du MLO</label><input type="text" id="mloName" class="modal-input" placeholder="ex: LSPD Headquarters"/></div>
+      <div class="modal-field"><label>Ressource FiveM</label><input type="text" id="mloResource" class="modal-input" placeholder="ex: lspd-hq-mlo"/></div>
+      <div class="modal-field"><label>Coordonnées (x, y, z)</label><input type="text" id="mloCoords" class="modal-input" placeholder="ex: 440.1, -982.4, 30.6"/></div>
+      <div class="modal-field"><label>Statut</label><select id="mloStatus" class="modal-input"><option>✅ Terminé</option><option>🔧 En cours</option><option>💡 Idée</option></select></div>
+      <div class="modal-field"><label>Notes</label><textarea id="mloNotes" class="modal-input" rows="3" placeholder="Modifications, problèmes connus..."></textarea></div>
+    </div>
+    <div class="modal-error" id="mloError"></div>
+    <div class="modal-btn-row">
+      <button class="mbtn mbtn-primary" onclick="saveMlo()">Enregistrer</button>
+      <button class="mbtn mbtn-warn" id="mloWithdrawBtn" style="display:none;" onclick="toggleWithdrawMlo()"></button>
+      <button class="mbtn mbtn-danger" id="mloDeleteBtn" style="display:none;" onclick="deleteMlo()">Supprimer</button>
+      <button class="mbtn mbtn-secondary" onclick="closeMloModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="mloReportsModal">
+  <div class="modal-box" style="max-width:500px;">
+    <div class="modal-title" id="mloReportsTitle">Signalements MLO</div>
+    <div id="mloReportsList" style="margin:1rem 0;max-height:300px;overflow-y:auto;"></div>
+    <div class="modal-btn-row"><button class="mbtn mbtn-danger" onclick="clearMloReports()">Effacer tout</button><button class="mbtn mbtn-secondary" onclick="closeMloReportsModal()">Fermer</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="reportMloModal">
+  <div class="modal-box"><div class="modal-icon">⚠</div><div class="modal-title" id="reportMloTitle">Signaler un problème</div><div class="modal-sub" id="reportMloSub"></div>
+    <div style="margin:1rem 0;">
+      <div class="modal-field"><label>Ton pseudo</label><input type="text" id="reportMloPseudo" class="modal-input" placeholder="ex: PlayerOne"/></div>
+      <div class="modal-field"><label>Description</label><textarea id="reportMloMsg" class="modal-input" rows="3" placeholder="L'intérieur ne charge pas..."></textarea></div>
+    </div>
+    <div class="modal-error" id="reportMloError"></div>
+    <div class="modal-btn-row"><button class="mbtn mbtn-primary" onclick="submitMloReport()">Envoyer</button><button class="mbtn mbtn-secondary" onclick="closeReportMloModal()">Annuler</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="changelogModal">
+  <div class="modal-box">
+    <div class="modal-title" id="changelogModalTitle">Nouvelle entrée</div>
+    <div style="margin:1rem 0;">
+      <div class="modal-field"><label>Titre</label><input type="text" id="clTitle" class="modal-input" placeholder="ex: Mise à jour carpack v2.3"/></div>
+      <div class="modal-field"><label>Contenu</label><textarea id="clBody" class="modal-input" rows="5" placeholder="- Ajout du Firetruck&#10;- Correction du bug spawn..."></textarea></div>
+    </div>
+    <div class="modal-error" id="clError"></div>
+    <div class="modal-btn-row">
+      <button class="mbtn mbtn-primary" onclick="saveChangelog()">Publier</button>
+      <button class="mbtn mbtn-danger" id="clDeleteBtn" style="display:none;" onclick="deleteChangelog()">Supprimer</button>
+      <button class="mbtn mbtn-secondary" onclick="closeChangelogModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<canvas id="processingCanvas" style="display:none;"></canvas>
+
+<script>
+/* ══ UTILS ══ */
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function hashStr(s){let h=0;for(let i=0;i<s.length;i++)h=(Math.imul(31,h)+s.charCodeAt(i))|0;return Math.abs(h).toString(16)}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function fmtDate(ts){return new Date(ts).toLocaleString('fr-BE')}
+function load(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch{return d}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+function toast(msg,isErr=false){const t=document.createElement('div');t.className='toast';t.style.borderColor=isErr?'var(--red-border)':'var(--green-dim)';t.style.color=isErr?'var(--red)':'var(--green)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2500)}
+
+/* ══ PROGRESS ══ */
+function showProgress(p){const b=document.getElementById('progressBar');b.style.width=p+'%';b.style.opacity=p>=100?'0':'1'}
+
+/* ══ SHARE ══ */
+function shareLink(){navigator.clipboard.writeText(location.href).then(()=>toast('🔗 Lien copié !')).catch(()=>toast('✗ Impossible de copier',true))}
+
+/* ══ NAV ══ */
+const ALLOWED=['home','greenscreen','vehicles','mlo','changelog','tools','admin'];
+function showSection(id,el){
+  if(!ALLOWED.includes(id))return;
+  if(id==='admin'&&!isAdmin){toggleAdmin(document.getElementById('nav-admin-btn'));return}
+  showProgress(60);
+  document.querySelectorAll('.section').forEach(s=>{s.classList.remove('active');s.style.display='none'});
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const t=document.getElementById('section-'+id);if(!t)return;
+  t.classList.add('active');t.style.display='block';
+  if(el)el.classList.add('active');
+  if(id==='vehicles'){renderVehiclesPublic();if(isAdmin)renderVehiclesAdmin()}
+  if(id==='mlo'){renderMloPublic();if(isAdmin)renderMloAdmin()}
+  if(id==='changelog')renderChangelog();
+  if(id==='admin')updateDashboard();
+  if(id==='home')updateHomeStats();
+  setTimeout(()=>showProgress(100),120);
+  setTimeout(()=>{document.getElementById('progressBar').style.opacity='0'},500);
+}
+
+/* ══ ADMIN ══ */
+const HASH=hashStr('siska');
+let isAdmin=false;
+function toggleAdmin(el){
+  if(isAdmin){isAdmin=false;el.innerHTML='🔐 Admin <span id="adminReportDot"></span>';el.classList.remove('admin-on');lockAdmin()}
+  else{document.getElementById('adminModal').classList.remove('hidden');document.getElementById('adminPwInput').value='';document.getElementById('adminError').textContent='';setTimeout(()=>document.getElementById('adminPwInput').focus(),100)}
+}
+function closeAdminModal(){document.getElementById('adminModal').classList.add('hidden')}
+function checkAdmin(){
+  if(hashStr(document.getElementById('adminPwInput').value)===HASH){
+    isAdmin=true;closeAdminModal();
+    const b=document.getElementById('nav-admin-btn');
+    b.innerHTML='🔓 Admin <span id="adminReportDot"></span>';
+    b.classList.add('admin-on');
+    unlockAdmin();
+  }else{document.getElementById('adminError').textContent='✗ Mot de passe incorrect';document.getElementById('adminPwInput').value='';document.getElementById('adminPwInput').focus()}
+}
+function unlockAdmin(){
+  document.getElementById('btnAddVeh').style.display='';
+  document.getElementById('btnAddMlo').style.display='';
+  document.getElementById('btnAddChangelog').style.display='';
+  document.getElementById('notepadCard').style.display='';
+  document.getElementById('vehPublicTab').style.display='none';
+  document.getElementById('mloPublicTab').style.display='none';
+  document.getElementById('vehAdminTab').style.display='';
+  document.getElementById('mloAdminTab').style.display='';
+  document.getElementById('notepadText').value=load('sha77e_notepad','');
+  switchVehTab('admin',document.getElementById('vehAdminTab'));
+  switchMloTab('admin',document.getElementById('mloAdminTab'));
+  renderVehiclesAdmin();renderMloAdmin();updateReportBadges();updateDashboard();
+}
+function lockAdmin(){
+  ['btnAddVeh','btnAddMlo','btnAddChangelog','notepadCard'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('vehPublicTab').style.display='';
+  document.getElementById('mloPublicTab').style.display='';
+  document.getElementById('vehAdminTab').style.display='none';
+  document.getElementById('mloAdminTab').style.display='none';
+  switchVehTab('public',document.getElementById('vehPublicTab'));
+  switchMloTab('public',document.getElementById('mloPublicTab'));
+}
+
+/* TABS */
+let curVehTab='public',curMloTab='public';
+function switchVehTab(t,el){curVehTab=t;document.querySelectorAll('#vehTabs .tab').forEach(x=>x.classList.remove('active'));if(el)el.classList.add('active');document.getElementById('vehPublicView').style.display=t==='public'?'':'none';document.getElementById('vehAdminView').style.display=t==='admin'?'':'none';if(t==='admin')renderVehiclesAdmin();else renderVehiclesPublic()}
+function switchMloTab(t,el){curMloTab=t;document.querySelectorAll('#mloTabs .tab').forEach(x=>x.classList.remove('active'));if(el)el.classList.add('active');document.getElementById('mloPublicView').style.display=t==='public'?'':'none';document.getElementById('mloAdminView').style.display=t==='admin'?'':'none';if(t==='admin')renderMloAdmin();else renderMloPublic()}
+
+/* ══ STATUS BADGE ══ */
+function statusBadge(s){
+  const map={'✅ Validé':'b-ok','🔧 En cours':'b-wip','❌ Problème':'b-err','🚫 Retiré':'b-off','✅ Terminé':'b-ok','💡 Idée':'b-idea'};
+  return`<span class="db-badge ${map[s]||'b-wip'}">${esc(s)}</span>`;
+}
+
+/* ══ VEHICLES ══ */
+let vehicles=load('sha77e_vehicles',[]);
+let vehReports=load('sha77e_veh_reports',{});
+let editingVehId=null;
+function saveVehicles(){save('sha77e_vehicles',vehicles);save('sha77e_veh_reports',vehReports)}
+
+function renderVehiclesPublic(){
+  const q=document.getElementById('vehSearch').value.toLowerCase();
+  const cat=document.getElementById('vehCatFilter').value;
+  const sta=document.getElementById('vehStatusFilter').value;
+  let list=vehicles.filter(v=>
+    (!q||v.name.toLowerCase().includes(q)||v.spawn.toLowerCase().includes(q))&&
+    (!cat||v.cat===cat)&&
+    (!sta||(v.withdrawn?'🚫 Retiré':v.status)===sta)
+  );
+  document.getElementById('withdrawnBanner').style.display=vehicles.some(v=>v.withdrawn)?'flex':'none';
+  const grid=document.getElementById('vehPublicGrid'),empty=document.getElementById('vehPublicEmpty');
+  if(!list.length){grid.innerHTML='';empty.style.display='block';return}
+  empty.style.display='none';
+  grid.innerHTML=list.map(v=>`
+    <div class="db-card ${v.withdrawn?'withdrawn':''}">
+      ${v.img?`<img class="db-card-img" src="${esc(v.img)}" alt="${esc(v.name)}"/>`:`<div class="db-card-img-placeholder">🚗</div>`}
+      <div class="db-card-body">
+        <div class="db-card-top"><div><div class="db-card-name">${esc(v.name)}</div><div class="db-card-spawn">${esc(v.spawn)}</div></div>${statusBadge(v.withdrawn?'🚫 Retiré':v.status)}</div>
+        <div class="db-card-meta">Catégorie : ${esc(v.cat)}${v.withdrawn?'<br><span style="color:var(--red);font-size:.75rem;">⚠ Temporairement retiré</span>':v.notes?`<br>${esc(v.notes.slice(0,60))}${v.notes.length>60?'…':''}`:''}</div>
+        ${!v.withdrawn&&!isAdmin?`<div class="db-card-actions"><button class="btn btn-danger btn-sm" onclick="openReportVeh('${v.id}')">⚠ Signaler</button></div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function renderVehiclesAdmin(){
+  const q=document.getElementById('vehAdminSearch').value.toLowerCase();
+  const sta=document.getElementById('vehAdminStatus').value;
+  let list=vehicles.filter(v=>(!q||v.name.toLowerCase().includes(q)||v.spawn.toLowerCase().includes(q))&&(!sta||(v.withdrawn?'🚫 Retiré':v.status)===sta));
+  const grid=document.getElementById('vehAdminGrid'),empty=document.getElementById('vehAdminEmpty');
+  if(!list.length){grid.innerHTML='';empty.style.display='block';return}
+  empty.style.display='none';
+  grid.innerHTML=list.map(v=>{
+    const rc=(vehReports[v.id]||[]).length;
+    return`<div class="db-card clickable ${v.withdrawn?'withdrawn':''}" onclick="openEditVehicle('${v.id}')">
+      ${v.img?`<img class="db-card-img" src="${esc(v.img)}" alt="${esc(v.name)}"/>`:`<div class="db-card-img-placeholder">🚗</div>`}
+      <div class="db-card-body">
+        <div class="db-card-top"><div><div class="db-card-name">${esc(v.name)}</div><div class="db-card-spawn">${esc(v.spawn)}</div></div>${statusBadge(v.withdrawn?'🚫 Retiré':v.status)}</div>
+        <div class="db-card-meta">Catégorie : ${esc(v.cat)}${v.notes?`<br>${esc(v.notes.slice(0,60))}${v.notes.length>60?'…':''}`:''}</div>
+        ${rc>0?`<div class="report-count" onclick="event.stopPropagation();openVehReports('${v.id}')">⚠ ${rc} signalement${rc>1?'s':''} — voir</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let _vehImgData='';
+function previewVehImg(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{_vehImgData=e.target.result;document.getElementById('vehImgPreview').src=e.target.result;document.getElementById('vehImgPreview').style.display='block'};
+  reader.readAsDataURL(file);
+}
+function openAddVehicle(){
+  editingVehId=null;_vehImgData='';
+  document.getElementById('vehModalTitle').textContent='Ajouter un véhicule';
+  ['vehName','vehSpawn','vehNotes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('vehCat').value='Pompiers';document.getElementById('vehStatus').value='✅ Validé';
+  document.getElementById('vehImgInput').value='';document.getElementById('vehImgPreview').style.display='none';
+  document.getElementById('vehError').textContent='';
+  document.getElementById('vehDeleteBtn').style.display='none';document.getElementById('vehWithdrawBtn').style.display='none';
+  document.getElementById('vehModal').classList.remove('hidden');
+}
+function openEditVehicle(id){
+  const v=vehicles.find(x=>x.id===id);if(!v)return;
+  editingVehId=id;_vehImgData=v.img||'';
+  document.getElementById('vehModalTitle').textContent='Modifier · '+v.name;
+  document.getElementById('vehName').value=v.name;document.getElementById('vehSpawn').value=v.spawn;
+  document.getElementById('vehCat').value=v.cat;document.getElementById('vehStatus').value=v.status;
+  document.getElementById('vehNotes').value=v.notes||'';
+  document.getElementById('vehImgInput').value='';
+  const prev=document.getElementById('vehImgPreview');
+  if(v.img){prev.src=v.img;prev.style.display='block'}else{prev.style.display='none'}
+  document.getElementById('vehError').textContent='';
+  document.getElementById('vehDeleteBtn').style.display='';
+  const wb=document.getElementById('vehWithdrawBtn');wb.style.display='';
+  wb.textContent=v.withdrawn?'✅ Remettre en service':'🚫 Retirer temporairement';
+  wb.className=v.withdrawn?'mbtn mbtn-primary':'mbtn mbtn-warn';
+  document.getElementById('vehModal').classList.remove('hidden');
+}
+function saveVehicle(){
+  const name=document.getElementById('vehName').value.trim(),spawn=document.getElementById('vehSpawn').value.trim();
+  if(!name||!spawn){document.getElementById('vehError').textContent='✗ Nom et Spawn name obligatoires';return}
+  const data={name,spawn,cat:document.getElementById('vehCat').value,status:document.getElementById('vehStatus').value,notes:document.getElementById('vehNotes').value.trim(),img:_vehImgData};
+  if(editingVehId){Object.assign(vehicles.find(x=>x.id===editingVehId),data)}
+  else{vehicles.push({id:uid(),withdrawn:false,...data})}
+  saveVehicles();closeVehModal();renderVehiclesAdmin();renderVehiclesPublic();updateHomeStats();updateDashboard();
+}
+function toggleWithdrawVeh(){const v=vehicles.find(x=>x.id===editingVehId);if(!v)return;v.withdrawn=!v.withdrawn;saveVehicles();closeVehModal();renderVehiclesAdmin();renderVehiclesPublic();updateDashboard()}
+function deleteVehicle(){if(!confirm('Supprimer ?'))return;vehicles=vehicles.filter(x=>x.id!==editingVehId);delete vehReports[editingVehId];saveVehicles();closeVehModal();renderVehiclesAdmin();renderVehiclesPublic();updateHomeStats();updateDashboard()}
+function closeVehModal(){document.getElementById('vehModal').classList.add('hidden')}
+
+function openReportVeh(id){
+  const v=vehicles.find(x=>x.id===id);if(!v)return;
+  document.getElementById('reportVehTitle').textContent='Signaler · '+v.name;
+  document.getElementById('reportVehSub').textContent='Spawn : '+v.spawn;
+  ['reportVehPseudo','reportVehMsg'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('reportVehError').style.color='var(--red)';document.getElementById('reportVehError').textContent='';
+  document.getElementById('reportVehModal').dataset.vid=id;
+  document.getElementById('reportVehModal').classList.remove('hidden');
+}
+function submitVehReport(){
+  const id=document.getElementById('reportVehModal').dataset.vid;
+  const pseudo=document.getElementById('reportVehPseudo').value.trim(),msg=document.getElementById('reportVehMsg').value.trim();
+  if(!pseudo||!msg){document.getElementById('reportVehError').textContent='✗ Pseudo et message obligatoires';return}
+  if(!vehReports[id])vehReports[id]=[];
+  vehReports[id].push({pseudo,msg,ts:Date.now()});
+  saveVehicles();updateReportBadges();
+  document.getElementById('reportVehError').style.color='var(--green)';
+  document.getElementById('reportVehError').textContent='✅ Signalement envoyé, merci !';
+  setTimeout(()=>{closeReportVehModal();document.getElementById('reportVehError').style.color='var(--red)'},1200);
+}
+function closeReportVehModal(){document.getElementById('reportVehModal').classList.add('hidden')}
+function openVehReports(id){
+  const v=vehicles.find(x=>x.id===id);
+  document.getElementById('vehReportsTitle').textContent='Signalements · '+(v?v.name:'');
+  document.getElementById('vehReportsModal').dataset.vid=id;
+  const list=vehReports[id]||[];
+  document.getElementById('vehReportsList').innerHTML=list.length?list.map(r=>`<div class="report-item"><div class="report-item-name">${esc(r.pseudo)}</div><div class="report-item-msg">${esc(r.msg)}</div><div class="report-item-date">${fmtDate(r.ts)}</div></div>`).join(''):'<div class="no-reports">Aucun signalement</div>';
+  document.getElementById('vehReportsModal').classList.remove('hidden');
+}
+function clearVehReports(){const id=document.getElementById('vehReportsModal').dataset.vid;vehReports[id]=[];saveVehicles();openVehReports(id);updateReportBadges();renderVehiclesAdmin();updateDashboard()}
+function closeVehReportsModal(){document.getElementById('vehReportsModal').classList.add('hidden')}
+
+/* ══ MLO ══ */
+let mlos=load('sha77e_mlos',[]);
+let mloReports=load('sha77e_mlo_reports',{});
+let editingMloId=null;
+function saveMlos(){save('sha77e_mlos',mlos);save('sha77e_mlo_reports',mloReports)}
+
+function renderMloPublic(){
+  const q=document.getElementById('mloSearch').value.toLowerCase();
+  const sta=document.getElementById('mloStatusFilter').value;
+  let list=mlos.filter(m=>(!q||m.name.toLowerCase().includes(q)||m.resource.toLowerCase().includes(q))&&(!sta||(m.withdrawn?'🚫 Retiré':m.status)===sta));
+  const grid=document.getElementById('mloPublicGrid'),empty=document.getElementById('mloPublicEmpty');
+  if(!list.length){grid.innerHTML='';empty.style.display='block';return}
+  empty.style.display='none';
+  grid.innerHTML=list.map(m=>{
+    const rc=(mloReports[m.id]||[]).length;
+    const mapsLink=m.coords?`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(m.coords.replace(/\s/g,''))}`:null;
+    return`<div class="db-card ${m.withdrawn?'withdrawn':''}">
+      <div class="db-card-body">
+        <div class="db-card-top"><div><div class="db-card-name">${esc(m.name)}</div><div class="db-card-spawn">${esc(m.resource)}</div></div>${statusBadge(m.withdrawn?'🚫 Retiré':m.status)}</div>
+        <div class="db-card-meta">${m.coords?`📍 ${esc(m.coords)}<br>`:''}${m.withdrawn?'<span style="color:var(--red);font-size:.75rem;">⚠ Temporairement retiré</span>':m.notes?esc(m.notes.slice(0,80))+(m.notes.length>80?'…':''):''}</div>
+        ${!isAdmin&&rc>0?'':isAdmin&&rc>0?`<div class="report-count">⚠ ${rc} signalement${rc>1?'s':''}</div>`:''}
+        <div class="db-card-actions" style="margin-top:8px;">
+          ${m.coords?`<a href="${mapsLink}" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;">🗺 Carte</a>`:''}
+          ${!m.withdrawn&&!isAdmin?`<button class="btn btn-danger btn-sm" onclick="openReportMlo('${m.id}')">⚠ Signaler</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderMloAdmin(){
+  const q=document.getElementById('mloAdminSearch').value.toLowerCase();
+  let list=mlos.filter(m=>!q||m.name.toLowerCase().includes(q)||m.resource.toLowerCase().includes(q));
+  const grid=document.getElementById('mloAdminGrid'),empty=document.getElementById('mloAdminEmpty');
+  if(!list.length){grid.innerHTML='';empty.style.display='block';return}
+  empty.style.display='none';
+  grid.innerHTML=list.map(m=>{
+    const rc=(mloReports[m.id]||[]).length;
+    const mapsLink=m.coords?`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(m.coords.replace(/\s/g,''))}`:null;
+    return`<div class="db-card clickable ${m.withdrawn?'withdrawn':''}" onclick="openEditMlo('${m.id}')">
+      <div class="db-card-body">
+        <div class="db-card-top"><div><div class="db-card-name">${esc(m.name)}</div><div class="db-card-spawn">${esc(m.resource)}</div></div>${statusBadge(m.withdrawn?'🚫 Retiré':m.status)}</div>
+        <div class="db-card-meta">${m.coords?`📍 ${esc(m.coords)}<br>`:''}${m.notes?esc(m.notes.slice(0,60))+(m.notes.length>60?'…':''):''}</div>
+        ${rc>0?`<div class="report-count" onclick="event.stopPropagation();openMloReports('${m.id}')">⚠ ${rc} signalement${rc>1?'s':''} — voir</div>`:''}
+        ${m.coords?`<div style="margin-top:8px;" onclick="event.stopPropagation()"><a href="${mapsLink}" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;">🗺 Carte</a></div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openAddMlo(){
+  editingMloId=null;
+  document.getElementById('mloModalTitle').textContent='Ajouter un MLO';
+  ['mloName','mloResource','mloCoords','mloNotes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mloStatus').value='🔧 En cours';document.getElementById('mloError').textContent='';
+  document.getElementById('mloDeleteBtn').style.display='none';document.getElementById('mloWithdrawBtn').style.display='none';
+  document.getElementById('mloModal').classList.remove('hidden');
+}
+function openEditMlo(id){
+  const m=mlos.find(x=>x.id===id);if(!m)return;
+  editingMloId=id;
+  document.getElementById('mloModalTitle').textContent='Modifier · '+m.name;
+  document.getElementById('mloName').value=m.name;document.getElementById('mloResource').value=m.resource;
+  document.getElementById('mloCoords').value=m.coords||'';document.getElementById('mloStatus').value=m.status;
+  document.getElementById('mloNotes').value=m.notes||'';document.getElementById('mloError').textContent='';
+  document.getElementById('mloDeleteBtn').style.display='';
+  const wb=document.getElementById('mloWithdrawBtn');wb.style.display='';
+  wb.textContent=m.withdrawn?'✅ Remettre en service':'🚫 Retirer temporairement';
+  wb.className=m.withdrawn?'mbtn mbtn-primary':'mbtn mbtn-warn';
+  document.getElementById('mloModal').classList.remove('hidden');
+}
+function saveMlo(){
+  const name=document.getElementById('mloName').value.trim();if(!name){document.getElementById('mloError').textContent='✗ Nom obligatoire';return}
+  const data={name,resource:document.getElementById('mloResource').value.trim(),coords:document.getElementById('mloCoords').value.trim(),status:document.getElementById('mloStatus').value,notes:document.getElementById('mloNotes').value.trim()};
+  if(editingMloId){Object.assign(mlos.find(x=>x.id===editingMloId),data)}
+  else{mlos.push({id:uid(),withdrawn:false,...data})}
+  saveMlos();closeMloModal();renderMloAdmin();renderMloPublic();updateHomeStats();updateDashboard();
+}
+function toggleWithdrawMlo(){const m=mlos.find(x=>x.id===editingMloId);if(!m)return;m.withdrawn=!m.withdrawn;saveMlos();closeMloModal();renderMloAdmin();renderMloPublic();updateDashboard()}
+function deleteMlo(){if(!confirm('Supprimer ?'))return;mlos=mlos.filter(x=>x.id!==editingMloId);delete mloReports[editingMloId];saveMlos();closeMloModal();renderMloAdmin();renderMloPublic();updateHomeStats();updateDashboard()}
+function closeMloModal(){document.getElementById('mloModal').classList.add('hidden')}
+
+function openReportMlo(id){
+  const m=mlos.find(x=>x.id===id);if(!m)return;
+  document.getElementById('reportMloTitle').textContent='Signaler · '+m.name;
+  document.getElementById('reportMloSub').textContent='Ressource : '+m.resource;
+  ['reportMloPseudo','reportMloMsg'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('reportMloError').style.color='var(--red)';document.getElementById('reportMloError').textContent='';
+  document.getElementById('reportMloModal').dataset.mid=id;
+  document.getElementById('reportMloModal').classList.remove('hidden');
+}
+function submitMloReport(){
+  const id=document.getElementById('reportMloModal').dataset.mid;
+  const pseudo=document.getElementById('reportMloPseudo').value.trim(),msg=document.getElementById('reportMloMsg').value.trim();
+  if(!pseudo||!msg){document.getElementById('reportMloError').textContent='✗ Pseudo et message obligatoires';return}
+  if(!mloReports[id])mloReports[id]=[];
+  mloReports[id].push({pseudo,msg,ts:Date.now()});
+  saveMlos();updateReportBadges();
+  document.getElementById('reportMloError').style.color='var(--green)';
+  document.getElementById('reportMloError').textContent='✅ Signalement envoyé, merci !';
+  setTimeout(()=>{closeReportMloModal();document.getElementById('reportMloError').style.color='var(--red)'},1200);
+}
+function closeReportMloModal(){document.getElementById('reportMloModal').classList.add('hidden')}
+function openMloReports(id){
+  const m=mlos.find(x=>x.id===id);
+  document.getElementById('mloReportsTitle').textContent='Signalements · '+(m?m.name:'');
+  document.getElementById('mloReportsModal').dataset.mid=id;
+  const list=mloReports[id]||[];
+  document.getElementById('mloReportsList').innerHTML=list.length?list.map(r=>`<div class="report-item"><div class="report-item-name">${esc(r.pseudo)}</div><div class="report-item-msg">${esc(r.msg)}</div><div class="report-item-date">${fmtDate(r.ts)}</div></div>`).join(''):'<div class="no-reports">Aucun signalement</div>';
+  document.getElementById('mloReportsModal').classList.remove('hidden');
+}
+function clearMloReports(){const id=document.getElementById('mloReportsModal').dataset.mid;mloReports[id]=[];saveMlos();openMloReports(id);updateReportBadges();renderMloAdmin();updateDashboard()}
+function closeMloReportsModal(){document.getElementById('mloReportsModal').classList.add('hidden')}
+
+/* ══ CHANGELOG ══ */
+let changelog=load('sha77e_changelog',[]);
+let editingClId=null;
+function saveChangelog2(){save('sha77e_changelog',changelog)}
+
+function renderChangelog(){
+  const list=document.getElementById('changelogList'),empty=document.getElementById('changelogEmpty');
+  if(!changelog.length){list.innerHTML='';empty.style.display='block';return}
+  empty.style.display='none';
+  list.innerHTML=[...changelog].reverse().map(c=>`
+    <div class="changelog-item">
+      <div class="changelog-date">${fmtDate(c.ts)}</div>
+      <div class="changelog-title">${esc(c.title)}</div>
+      <div class="changelog-body">${esc(c.body)}</div>
+      ${isAdmin?`<button class="changelog-del" onclick="openEditChangelog('${c.id}')">✏</button>`:''}
+    </div>`).join('');
+}
+function openAddChangelog(){
+  editingClId=null;
+  document.getElementById('changelogModalTitle').textContent='Nouvelle entrée';
+  document.getElementById('clTitle').value='';document.getElementById('clBody').value='';
+  document.getElementById('clError').textContent='';document.getElementById('clDeleteBtn').style.display='none';
+  document.getElementById('changelogModal').classList.remove('hidden');
+}
+function openEditChangelog(id){
+  const c=changelog.find(x=>x.id===id);if(!c)return;
+  editingClId=id;
+  document.getElementById('changelogModalTitle').textContent='Modifier';
+  document.getElementById('clTitle').value=c.title;document.getElementById('clBody').value=c.body;
+  document.getElementById('clError').textContent='';document.getElementById('clDeleteBtn').style.display='';
+  document.getElementById('changelogModal').classList.remove('hidden');
+}
+function saveChangelog(){
+  const title=document.getElementById('clTitle').value.trim(),body=document.getElementById('clBody').value.trim();
+  if(!title){document.getElementById('clError').textContent='✗ Titre obligatoire';return}
+  if(editingClId){const c=changelog.find(x=>x.id===editingClId);c.title=title;c.body=body}
+  else{changelog.push({id:uid(),title,body,ts:Date.now()})}
+  saveChangelog2();closeChangelogModal();renderChangelog();updateDashboard();
+}
+function deleteChangelog(){if(!confirm('Supprimer ?'))return;changelog=changelog.filter(x=>x.id!==editingClId);saveChangelog2();closeChangelogModal();renderChangelog();updateDashboard()}
+function closeChangelogModal(){document.getElementById('changelogModal').classList.add('hidden')}
+
+/* ══ DASHBOARD ══ */
+function updateDashboard(){
+  const totalReports=Object.values(vehReports).reduce((a,b)=>a+b.length,0)+Object.values(mloReports).reduce((a,b)=>a+b.length,0);
+  const withdrawn=vehicles.filter(v=>v.withdrawn).length+mlos.filter(m=>m.withdrawn).length;
+  document.getElementById('dashVeh').textContent=vehicles.length;
+  document.getElementById('dashMlo').textContent=mlos.length;
+  document.getElementById('dashChangelog').textContent=changelog.length;
+  document.getElementById('dashReports').textContent=totalReports;
+  document.getElementById('dashWithdrawn').textContent=withdrawn;
+  // quick report list
+  const allReports=[];
+  vehicles.forEach(v=>(vehReports[v.id]||[]).forEach(r=>allReports.push({type:'🚗',name:v.name,r})));
+  mlos.forEach(m=>(mloReports[m.id]||[]).forEach(r=>allReports.push({type:'🏗',name:m.name,r})));
+  allReports.sort((a,b)=>b.r.ts-a.r.ts);
+  const dl=document.getElementById('dashReportsList');
+  dl.innerHTML=allReports.length?allReports.slice(0,5).map(x=>`<div class="report-item"><div class="report-item-name">${x.type} ${esc(x.name)} · ${esc(x.r.pseudo)}</div><div class="report-item-msg">${esc(x.r.msg.slice(0,80))}</div><div class="report-item-date">${fmtDate(x.r.ts)}</div></div>`).join(''):'<div class="no-reports">Aucun signalement</div>';
+}
+function updateHomeStats(){document.getElementById('homeStatVeh').textContent=vehicles.length;document.getElementById('homeStatMlo').textContent=mlos.length}
+function updateReportBadges(){
+  const vt=Object.values(vehReports).reduce((a,b)=>a+b.length,0);
+  const vb=document.getElementById('vehReportBadge');vb.style.display=vt>0?'':'none';vb.textContent=vt;
+  const mt=Object.values(mloReports).reduce((a,b)=>a+b.length,0);
+  const mb=document.getElementById('mloReportBadge');mb.style.display=mt>0?'':'none';mb.textContent=mt;
+  const dot=document.getElementById('adminReportDot');
+  if(dot){dot.style.display=(vt+mt)>0?'inline-block':'none'}
+}
+
+/* ══ EXPORT / IMPORT ══ */
+function exportData(){
+  const data={vehicles,vehReports,mlos,mloReports,changelog,notepad:load('sha77e_notepad',''),exportedAt:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sha77e_dev_backup_'+Date.now()+'.json';a.click();
+  toast('💾 Export réussi !');
+}
+function importData(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(d.vehicles)vehicles=d.vehicles;if(d.vehReports)vehReports=d.vehReports;
+      if(d.mlos)mlos=d.mlos;if(d.mloReports)mloReports=d.mloReports;
+      if(d.changelog)changelog=d.changelog;
+      if(d.notepad)save('sha77e_notepad',d.notepad);
+      saveVehicles();saveMlos();saveChangelog2();
+      renderVehiclesAdmin();renderVehiclesPublic();renderMloAdmin();renderMloPublic();renderChangelog();updateDashboard();updateHomeStats();updateReportBadges();
+      toast('✅ Import réussi !');
+    }catch{toast('✗ Fichier JSON invalide',true)}
+  };reader.readAsText(file);
+  input.value='';
+}
+
+/* ══ NOTEPAD ══ */
+let notepadTimer=null;
+function saveNotepad(){
+  clearTimeout(notepadTimer);
+  notepadTimer=setTimeout(()=>{save('sha77e_notepad',document.getElementById('notepadText').value);document.getElementById('notepadStatus').textContent='Auto-sauvegardé ✓'},500);
+}
+function clearNotepad(){if(!confirm('Effacer toutes les notes ?'))return;document.getElementById('notepadText').value='';save('sha77e_notepad','');document.getElementById('notepadStatus').textContent='Effacé'}
+
+/* ══ PLATE GEN ══ */
+const PLATE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ';
+const PLATE_NUMS='0123456789';
+function rChar(){return PLATE_CHARS[Math.floor(Math.random()*PLATE_CHARS.length)]}
+function rNum(){return PLATE_NUMS[Math.floor(Math.random()*PLATE_NUMS.length)]}
+function generatePlate(){
+  const style=document.getElementById('plateStyle').value;
+  let plate='';
+  if(style==='vanity'){
+    const custom=document.getElementById('plateCustom').value.toUpperCase().replace(/[^A-Z0-9 ]/g,'').slice(0,8);
+    plate=custom||'CUSTOM';
+  }else{
+    // Format standard GTA : 2 lettres + 2 chiffres + espace + 2 lettres + 1 chiffre
+    plate=`${rChar()}${rChar()}${rNum()}${rNum()} ${rChar()}${rChar()}${rNum()}`;
+  }
+  document.getElementById('plateDisplay').textContent=plate;
+}
+function updatePlate(){
+  const style=document.getElementById('plateStyle').value;
+  document.getElementById('vanityInput').style.display=style==='vanity'?'block':'none';
+  if(style==='vanity'){
+    const custom=document.getElementById('plateCustom').value.toUpperCase().replace(/[^A-Z0-9 ]/g,'').slice(0,8);
+    document.getElementById('plateDisplay').textContent=custom||'VANITY';
+  }else generatePlate();
+}
+function copyPlate(){const p=document.getElementById('plateDisplay').textContent;navigator.clipboard.writeText(p).then(()=>toast('📋 Plaque copiée : '+p)).catch(()=>toast('✗ Impossible de copier',true))}
+
+/* ══ TIME CALC ══ */
+function updateTimeCalc(){
+  const mult=parseInt(document.getElementById('timeMult').value);
+  const real=parseInt(document.getElementById('timeReal').value)||0;
+  document.getElementById('timeMultVal').textContent='x'+mult;
+  const rpMin=real*mult;
+  const h=Math.floor(rpMin/60),m=rpMin%60;
+  document.getElementById('timeRp').textContent=`${h}h${m>0?m.toString().padStart(2,'0'):'00'}`;
+  document.getElementById('timeConv1').textContent=mult+' min';
+  document.getElementById('timeConv2').textContent=mult+'h';
+  const dayReal=(24*60)/mult;
+  document.getElementById('timeConv3').textContent=Math.floor(dayReal/60)+'h'+Math.round(dayReal%60).toString().padStart(2,'0');
+}
+
+/* ══ GREENSCREEN ══ */
+const MAX_SIZE=20*1024*1024;let loadedImage=null,originalFileName='prop',canvasReady=false;
+const presets=[{label:'Chroma Green',hex:'#00B140'},{label:'Vert clair',hex:'#00FF00'},{label:'Vert foncé',hex:'#006400'},{label:'Bleu chroma',hex:'#0047AB'},{label:'Rouge',hex:'#FF0000'},{label:'Blanc',hex:'#FFFFFF'},{label:'Noir',hex:'#000000'},{label:'Gris',hex:'#808080'}];
+document.getElementById('presetRow').innerHTML='';
+presets.forEach((p,i)=>{const btn=document.createElement('div');btn.className='preset-btn'+(i===0?' selected':'');btn.style.background=p.hex;btn.title=p.label;btn.onclick=()=>{document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');document.getElementById('colorPicker').value=p.hex;document.getElementById('hexInput').value=p.hex.toUpperCase();if(loadedImage)renderPreview()};document.getElementById('presetRow').appendChild(btn)});
+function syncColor(v){document.getElementById('hexInput').value=v.toUpperCase();if(loadedImage)renderPreview()}
+function syncHex(v){const c=v.trim();if(/^#[0-9A-Fa-f]{6}$/.test(c)){document.getElementById('colorPicker').value=c;if(loadedImage)renderPreview()}}
+function updatePadding(v){document.getElementById('paddingVal').textContent=v+'px';if(loadedImage)renderPreview()}
+const uploadZone=document.getElementById('uploadZone');
+uploadZone.addEventListener('dragover',e=>{e.preventDefault();uploadZone.classList.add('drag-over')});
+uploadZone.addEventListener('dragleave',()=>uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop',e=>{e.preventDefault();uploadZone.classList.remove('drag-over');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0])});
+function handleFile(file){
+  if(!file||!file.type.startsWith('image/')){setStatus('','✗ Fichier invalide');return}
+  if(file.size>MAX_SIZE){setStatus('','✗ Fichier trop lourd — max 20 Mo');return}
+  originalFileName=file.name.replace(/\.[^/.]+$/,'').replace(/[^a-zA-Z0-9_\-. ]/g,'_').slice(0,100)||'prop';
+  setStatus('yellow','⚙ Chargement…');
+  const reader=new FileReader();
+  reader.onload=e=>{const img=new Image();img.onload=()=>{loadedImage=img;canvasReady=false;setStatus('green',`✓ ${img.width}×${img.height}px · ${(file.size/1024).toFixed(0)} Ko`);document.getElementById('processBtn').disabled=false;document.getElementById('downloadBtn').disabled=true;document.getElementById('resetBtn').disabled=false;document.getElementById('previewDims').textContent=`${img.width} × ${img.height}px`;document.getElementById('previewPlaceholder').style.display='none';renderPreview()};img.src=e.target.result};
+  reader.readAsDataURL(file);
+}
+function renderPreview(){const c=document.getElementById('previewCanvas'),w=c.parentElement.clientWidth||500,h=Math.round(w*.66);c.width=w;c.height=h;const ctx=c.getContext('2d');drawChecker(ctx,w,h);const r=Math.min(w/loadedImage.width,h/loadedImage.height)*.88;ctx.drawImage(loadedImage,(w-loadedImage.width*r)/2,(h-loadedImage.height*r)/2,loadedImage.width*r,loadedImage.height*r);c.style.display='block'}
+function drawChecker(ctx,w,h,s=14){for(let y=0;y<h;y+=s)for(let x=0;x<w;x+=s){ctx.fillStyle=((x/s+y/s)%2===0)?'#141a22':'#0e1218';ctx.fillRect(x,y,s,s)}}
+function processImage(){
+  if(!loadedImage)return;setStatus('yellow','⚙ Traitement…');document.getElementById('processBtn').disabled=true;showProgress(40);
+  setTimeout(()=>{
+    const pad=parseInt(document.getElementById('paddingSlider').value),bg=document.getElementById('colorPicker').value;
+    const off=document.getElementById('processingCanvas');const fw=loadedImage.width+pad*2,fh=loadedImage.height+pad*2;
+    off.width=fw;off.height=fh;const ctx=off.getContext('2d');ctx.fillStyle=bg;ctx.fillRect(0,0,fw,fh);ctx.drawImage(loadedImage,pad,pad);
+    const rc=document.getElementById('resultCanvas'),pw=rc.parentElement.clientWidth||500,ph=Math.round(pw*.66);
+    rc.width=pw;rc.height=ph;const rctx=rc.getContext('2d');rctx.fillStyle=bg;rctx.fillRect(0,0,pw,ph);
+    const r=Math.min(pw/fw,ph/fh)*.88;rctx.drawImage(off,(pw-fw*r)/2,(ph-fh*r)/2,fw*r,fh*r);
+    rc.style.display='block';document.getElementById('resultPlaceholder').style.display='none';
+    showProgress(100);setStatus('green',`✓ Fond appliqué — ${fw}×${fh}px`);
+    document.getElementById('processBtn').disabled=false;document.getElementById('downloadBtn').disabled=false;canvasReady=true;
+  },60);
+}
+function downloadImage(){
+  if(!canvasReady){setStatus('','✗ Applique d\'abord le fond');return}
+  const off=document.getElementById('processingCanvas'),fmt=document.querySelector('input[name="fmt"]:checked').value;
+  const mime={png:'image/png',jpeg:'image/jpeg',webp:'image/webp'},ext={png:'png',jpeg:'jpg',webp:'webp'};
+  const a=document.createElement('a');a.href=off.toDataURL(mime[fmt],fmt==='png'?1:.92);a.download=`${originalFileName}_fondvert.${ext[fmt]}`;a.click();
+  setStatus('green',`⬇ Téléchargé`);
+}
+function resetTool(){
+  loadedImage=null;canvasReady=false;originalFileName='prop';
+  ['previewCanvas','resultCanvas','processingCanvas'].forEach(id=>{const c=document.getElementById(id);c.getContext('2d').clearRect(0,0,c.width,c.height);c.style.display='none'});
+  document.getElementById('previewPlaceholder').style.display='flex';document.getElementById('resultPlaceholder').style.display='flex';
+  document.getElementById('fileInput').value='';document.getElementById('colorPicker').value='#00b140';document.getElementById('hexInput').value='#00B140';
+  document.getElementById('paddingSlider').value=20;document.getElementById('paddingVal').textContent='20px';
+  document.querySelector('input[name="fmt"][value="png"]').checked=true;
+  document.querySelectorAll('.preset-btn').forEach((b,i)=>b.classList.toggle('selected',i===0));
+  document.getElementById('previewDims').textContent='';
+  document.getElementById('processBtn').disabled=true;document.getElementById('downloadBtn').disabled=true;document.getElementById('resetBtn').disabled=true;
+  setStatus('','En attente d\'une image…');
+}
+function setStatus(type,msg){
+  document.getElementById('statusDot').className='status-dot'+(type==='green'?' green':type==='yellow'?' yellow':'');
+  document.getElementById('statusText').textContent=msg;
+}
+
+/* ══ INIT ══ */
+generatePlate();updateTimeCalc();updateHomeStats();renderVehiclesPublic();renderMloPublic();renderChangelog();updateReportBadges();
+</script>
+</body>
+</html>
